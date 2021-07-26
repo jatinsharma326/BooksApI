@@ -14,6 +14,8 @@
             @input="waitForSearch"
           >
           </v-text-field>
+          <!-- <div class="bookParent" v-for="item in items" :key="item.id"> -->
+          <!-- <img :src="item.volumeInfo.imageLinks.thumbnail" /> -->
           <div class="bookParent" v-for="item in items" :key="item.id">
             <!-- <img :src="item.volumeInfo.imageLinks.thumbnail" /> -->
             <a class="anchorTag" href="#" v-show="show">{{
@@ -21,6 +23,8 @@
             }}</a>
             <!-- @click="changeTheInputTitle" -->
           </div>
+          <!-- @click="changeTheInputTitle" -->
+          <!-- </div> -->
         </div>
       </v-col>
     </v-row>
@@ -61,7 +65,7 @@ export default {
       let response = await axios.get(`${this.BASE_URL}`, {
         params: {
           q: this.search,
-          apikey: "AIzaSyAPAU-uUc7h9mMCAwL2O_8wEoAXKV7CY2w",
+          apikey: "",
         },
       });
       // console.log(response.data.items);
