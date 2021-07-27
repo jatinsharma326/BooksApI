@@ -1,7 +1,7 @@
 <template>
-  <v-container>
-    <input />
-  </v-container>
+  <div class="menu pointerCursor hide">
+    <slot name="contentHandler"></slot>
+  </div>
 </template>
 
 <script>
