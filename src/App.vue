@@ -2,7 +2,9 @@
   <v-app>
     <v-app-bar color="green">
       <v-app-bar-nav-icon
-        ><v-icon color="brown">mdi-pencil</v-icon></v-app-bar-nav-icon
+        ><router-link to="/"
+          ><v-icon color="black">mdi-home</v-icon></router-link
+        ></v-app-bar-nav-icon
       >
       <!-- <v-toolbar-title>Dates</v-toolbar-title> -->
       <v-spacer></v-spacer>

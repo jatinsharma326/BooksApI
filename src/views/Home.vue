@@ -7,7 +7,59 @@
     <v-row aign="center">
       <v-col cols="12">
         <v-toolbar-title>State Selection</v-toolbar-title>
+        <!-- CheckBox Value -->
         <div v-on-clickaway="away" class="searchField dropdown">
+          <v-container fluid>
+            <v-row dense>
+              <v-col cols="12" class="d-flex flex-wrap justify-space-around">
+                <v-checkbox
+                  @click="selectCheckbox()"
+                  label="intitle"
+                  v-model="radioValue"
+                  value="intitle"
+                >
+                </v-checkbox>
+                <v-checkbox
+                  @click="selectCheckbox()"
+                  label="inauthor"
+                  v-model="radioValue"
+                  value="inauthor"
+                >
+                </v-checkbox>
+                <v-checkbox
+                  @click="selectCheckbox()"
+                  v-model="radioValue"
+                  label="inpublisher"
+                  value="inpublisher"
+                >
+                </v-checkbox>
+                <v-checkbox
+                  @click="selectCheckbox()"
+                  value="subject"
+                  label="subject"
+                  v-model="radioValue"
+                >
+                </v-checkbox>
+                <v-checkbox
+                  @click="selectCheckbox()"
+                  value="isbn"
+                  label="isbn"
+                  v-model="radioValue"
+                >
+                </v-checkbox>
+              </v-col>
+            </v-row>
+            <v-text-field
+              :label="
+                `Add
+              ${this.radioValue}
+              Input`
+              "
+              v-show="extraTextField"
+              v-model="extraInput"
+            >
+            </v-text-field>
+          </v-container>
           <v-text-field
             :label="labeling"
             v-model="search"
@@ -16,47 +68,59 @@
           </v-text-field>
           <!-- <div class="bookParent" v-for="item in items" :key="item.id"> -->
           <!-- <img :src="item.volumeInfo.imageLinks.thumbnail" /> -->
-          <div
-            class="clickUpdateElement"
-            v-for="(item, index) in items"
-            :key="item.id"
-          >
-            <HelloWorld v-show="show">
-              <template v-slot:contentHandler class="option" id="option1">
-                <div @click="clickCard(item, index)" class="containerForI">
-                  <v-img>
-                    <img :src="item.volumeInfo.imageLinks.thumbnail" />
-                  </v-img>
+          <div class="makelistflex">
+            <div
+              class="clickUpdateElement "
+              v-for="(item, index) in items"
+              :key="item.id"
+            >
+              <HelloWorld v-show="show">
+                <template v-slot:contentHandler class="option" id="option1">
+                  <div @click="clickCard(item, index)" class="dropdown-content">
+                    <v-img style="margin:50px">
+                      <img :src="item.volumeInfo.imageLinks.thumbnail" />
+                    </v-img>
 
-                  <a class="anchorTag">{{ item.volumeInfo.title }}</a>
-                  <!-- <span>{{ item.volumeInfo.author }}</span> -->
-                </div>
-              </template>
-            </HelloWorld>
+                    <a class="anchorTag">{{ item.volumeInfo.title }}</a>
+                    <!-- <span>{{ item.volumeInfo.author }}</span> -->
+                  </div>
+                </template>
+              </HelloWorld>
+            </div>
           </div>
           <div class="content" v-for="(item, index) in items" :key="index">
-            <Content v-show="indexToShow === null || indexToShow === index">
+            <Content v-show="indexToShow === index">
               <template v-slot:cardContent>
-                <v-card class="mx-auto" elevation="2" outlined shaped>
-                  <v-list-item three-line>
-                    <v-list-item-avatar>
-                      <v-img
-                        :src="item.volumeInfo.imageLinks.thumbnail"
-                      ></v-img>
-                    </v-list-item-avatar>
-                    <v-list-item-content>
-                      <v-card-title>
-                        {{ item.volumeInfo.title }}
-                      </v-card-title>
-                      <v-card-subtitle>
-                        {{ item.volumeInfo.description }}
-                      </v-card-subtitle>
-                    </v-list-item-content>
-                    <v-card-actions>
-                      <v-btn primary>Act</v-btn>
-                    </v-card-actions>
-                  </v-list-item>
-                </v-card>
+                <v-container>
+                  <v-row dense>
+                    <v-col cols="12">
+                      <v-card color="#F8485E">
+                        <div class="d-flex flex-no-wrap justify-space-between">
+                          <div>
+                            <v-card-title class="text-h5 whiteText">{{
+                              item.volumeInfo.title
+                            }}</v-card-title>
+
+                            <div style="margin-left:45px" class="whiteText">
+                              Author:{{ item.volumeInfo.authors }}
+                            </div>
+                            <v-card-subtitle
+                              class="whiteText"
+                              style="border-radius:30px"
+                              v-text="item.volumeInfo.description"
+                            ></v-card-subtitle>
+                          </div>
+
+                          <v-avatar class="ma-3" size="200" tile>
+                            <v-img
+                              :src="item.volumeInfo.imageLinks.thumbnail"
+                            ></v-img>
+                          </v-avatar>
+                        </div>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+                </v-container>
               </template>
             </Content>
           </div>
@@ -98,6 +162,14 @@ export default {
       labeling: "Search For Book",
       show: false,
       indexToShow: null,
+      // intitle: "",
+      // inauthor: "",
+      // inpublisher: "",
+      // subject: "",
+      // isbn: "",
+      radioValue: "",
+      extraTextField: false,
+      extraInput: "",
     };
   },
   components: {
@@ -112,33 +184,29 @@ export default {
   methods: {
     async getBooks() {
       this.show = true;
-      let response = await axios.get(`${this.BASE_URL}`, {
-        params: {
-          q: this.search,
-          apikey: "",
-        },
-      });
-      // console.log(response.data.items);
-      this.items = response.data.items;
+      if (this.search == "") {
+        return this.search;
+      } else {
+        let response = await axios.get(`${this.BASE_URL}`, {
+          params: {
+            q: `${this.search} ${this.radioValue}:${this.extraInput}`,
+            apikey: "",
+          },
+        });
+        // console.log(response.data.items);
+        this.items = response.data.items;
 
-      console.log(this.items);
-      // fetchAPI();
+        console.log(this.items);
+        // fetchAPI();
+      }
     },
     away() {
       console.log("clicked away");
       this.show = false;
     },
-    // closeDropdown() {
-    //   console.log("Blurr Happening");
-    //   this.show = false;
-    // },
     clickCard(item, index) {
-      // let id = document.querySelector(".anchorTag").getAttribute("title");
       console.log(item);
       this.indexToShow = index;
-      // this.imageSrc = target.volumeInfo.imageLinks.thumbnail;
-      // this.title = target.volumeInfo.title;
-      // this.description = item.volumeInfo.description;
       this.show = false;
     },
 
@@ -151,6 +219,13 @@ export default {
         this.getBooks();
       }, 1000);
     },
+    selectCheckbox() {
+      if (this.radioValue === "intitle") {
+        this.extraTextField = false;
+      } else {
+        this.extraTextField = true;
+      }
+    },
   },
 };
 </script>
@@ -161,14 +236,37 @@ export default {
 .anchorTag {
   /* position: absolute; */
   /* background-color: #f9f9f9; */
-  min-width: 160px;
+  max-width: 160px;
   /* box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2); */
-  padding: 12px 16px;
-  z-index: 1;
+  /* padding: 12px 16px; */
+  /* z-index: 1; */
   text-decoration: none;
+  color: darkmagenta;
+  margin-top: 50px;
 }
-.anchorTag:hover {
+
+.whiteText {
+  color: #eeeeee;
+}
+.dropdown-content {
+  display: -webkit-box;
+  /* position: absolute; */
+  right: 0;
+  background-color: honeydew;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
   display: block;
+}
+
+.dropdown-content:hover {
+  background-color: #f1f1f1;
 }
 </style>
 <style>
