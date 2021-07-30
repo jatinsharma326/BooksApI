@@ -16,55 +16,59 @@
           </v-text-field>
           <!-- <div class="bookParent" v-for="item in items" :key="item.id"> -->
           <!-- <img :src="item.volumeInfo.imageLinks.thumbnail" /> -->
-          <HelloWorld v-show="show" v-for="item in items" :key="item.id">
-            <template v-slot:contentHandler class="option" id="option1">
-              <div class="containerForI">
-                <img :src="item.volumeInfo.imageLinks.smallThumbnail" />
-                <a
-                  @click="updateCard"
-                  :title="item.volumeInfo.title"
-                  class="anchorTag"
-                  >{{ item.volumeInfo.title }}</a
-                >
-              </div>
-            </template>
-          </HelloWorld>
+          <div
+            class="clickUpdateElement"
+            v-for="(item, index) in items"
+            :key="item.id"
+          >
+            <HelloWorld v-show="show">
+              <template v-slot:contentHandler class="option" id="option1">
+                <div @click="clickCard(item, index)" class="containerForI">
+                  <v-img>
+                    <img :src="item.volumeInfo.imageLinks.thumbnail" />
+                  </v-img>
 
+                  <a class="anchorTag">{{ item.volumeInfo.title }}</a>
+                  <!-- <span>{{ item.volumeInfo.author }}</span> -->
+                </div>
+              </template>
+            </HelloWorld>
+          </div>
+          <div class="content" v-for="(item, index) in items" :key="index">
+            <Content v-show="indexToShow === null || indexToShow === index">
+              <template v-slot:cardContent>
+                <v-card class="mx-auto" elevation="2" outlined shaped>
+                  <v-list-item three-line>
+                    <v-list-item-avatar>
+                      <v-img
+                        :src="item.volumeInfo.imageLinks.thumbnail"
+                      ></v-img>
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                      <v-card-title>
+                        {{ item.volumeInfo.title }}
+                      </v-card-title>
+                      <v-card-subtitle>
+                        {{ item.volumeInfo.description }}
+                      </v-card-subtitle>
+                    </v-list-item-content>
+                    <v-card-actions>
+                      <v-btn primary>Act</v-btn>
+                    </v-card-actions>
+                  </v-list-item>
+                </v-card>
+              </template>
+            </Content>
+          </div>
           <!-- <img :src="item.volumeInfo.imageLinks.thumbnail" /> -->
           <!-- <a
-              @click="updateCard"
+              @click="clickCard"
               :title="item.volumeInfo.title"
               class="anchorTag"
               href="#"
               v-show="show"
               >{{ item.volumeInfo.title }}</a
             > -->
-        </div>
-        <div class="content">
-          <Content v-for="item in items" :key="item.id" v-show="show2">
-            <template v-slot:cardContent>
-              <v-card class="mx-auto" elevation="2" outlined shaped>
-                <v-list-item three-line>
-                  <v-list-item-avatar>
-                    <v-img
-                      :src="item.volumeInfo.imageLinks.smallThumbnail"
-                    ></v-img>
-                  </v-list-item-avatar>
-                  <v-list-item-content>
-                    <v-card-title>
-                      {{ item.volumeInfo.title }}
-                    </v-card-title>
-                    <v-card-subtitle>
-                      {{ item.volumeInfo.description }}
-                    </v-card-subtitle>
-                  </v-list-item-content>
-                  <v-card-actions>
-                    <v-btn primary>Act</v-btn>
-                  </v-card-actions>
-                </v-list-item>
-              </v-card>
-            </template>
-          </Content>
         </div>
       </v-col>
     </v-row>
@@ -93,7 +97,7 @@ export default {
       timerId: "",
       labeling: "Search For Book",
       show: false,
-      show2: false,
+      indexToShow: null,
     };
   },
   components: {
@@ -111,7 +115,7 @@ export default {
       let response = await axios.get(`${this.BASE_URL}`, {
         params: {
           q: this.search,
-          apikey: "AIzaSyAPAU-uUc7h9mMCAwL2O_8wEoAXKV7CY2w",
+          apikey: "",
         },
       });
       // console.log(response.data.items);
@@ -124,12 +128,20 @@ export default {
       console.log("clicked away");
       this.show = false;
     },
-    updateCard() {
-      let id = document.querySelector(".anchorTag").getAttribute("title");
-      console.log(id);
+    // closeDropdown() {
+    //   console.log("Blurr Happening");
+    //   this.show = false;
+    // },
+    clickCard(item, index) {
+      // let id = document.querySelector(".anchorTag").getAttribute("title");
+      console.log(item);
+      this.indexToShow = index;
+      // this.imageSrc = target.volumeInfo.imageLinks.thumbnail;
+      // this.title = target.volumeInfo.title;
+      // this.description = item.volumeInfo.description;
       this.show = false;
-      this.show2 = true;
     },
+
     //Method That Take and wait for the Input
     waitForSearch() {
       // this.search = "";
@@ -137,20 +149,12 @@ export default {
 
       this.timerId = setTimeout(() => {
         this.getBooks();
-      }, 500);
+      }, 1000);
     },
   },
 };
 </script>
 <style scoped>
-.containerForI {
-  /* display: flex; */
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  padding: 20px;
-  /* background-color: grey; */
-}
 .c {
   display: inline-block;
 }
