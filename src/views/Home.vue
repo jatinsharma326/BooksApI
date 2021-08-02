@@ -2,26 +2,27 @@
   <!-- Checkout this for Search in VUE API Manipulation  -->
   <!-- https://github.com/junip/vue-unsplash/blob/master/src/components/Pictures.vue -->
   <!-- TASK 2 IMPLEMENT The AutoComplete Feature -->
-
-  <v-container fluid>
+  <!-- Task 3 Search according all the input that user enters -->
+  <!-- Change the Author -->
+  <v-container @click="hideBar()" fluid>
     <v-row aign="center">
       <v-col cols="12">
         <v-toolbar-title>State Selection</v-toolbar-title>
         <!-- CheckBox Value -->
-        <div v-on-clickaway="away" class="searchField dropdown">
+        <div class="searchField dropdown">
           <v-container fluid>
             <v-row dense>
               <v-col cols="12" class="d-flex flex-wrap justify-space-around">
                 <v-checkbox
                   @click="selectCheckbox()"
-                  label="intitle"
+                  label="Title"
                   v-model="radioValue"
                   value="intitle"
                 >
                 </v-checkbox>
                 <v-checkbox
                   @click="selectCheckbox()"
-                  label="inauthor"
+                  label="Author"
                   v-model="radioValue"
                   value="inauthor"
                 >
@@ -29,20 +30,20 @@
                 <v-checkbox
                   @click="selectCheckbox()"
                   v-model="radioValue"
-                  label="inpublisher"
+                  label="Publisher"
                   value="inpublisher"
                 >
                 </v-checkbox>
                 <v-checkbox
                   @click="selectCheckbox()"
-                  value="subject"
+                  value="Subject"
                   label="subject"
                   v-model="radioValue"
                 >
                 </v-checkbox>
                 <v-checkbox
                   @click="selectCheckbox()"
-                  value="isbn"
+                  value="Isbn"
                   label="isbn"
                   v-model="radioValue"
                 >
@@ -50,11 +51,7 @@
               </v-col>
             </v-row>
             <v-text-field
-              :label="
-                `Add
-              ${this.radioValue}
-              Input`
-              "
+              label="Extra Input"
               v-show="extraTextField"
               v-model="extraInput"
             >
@@ -76,7 +73,10 @@
             >
               <HelloWorld v-show="show">
                 <template v-slot:contentHandler class="option" id="option1">
-                  <div @click="clickCard(item, index)" class="dropdown-content">
+                  <div
+                    @click.stop="clickCard(item, index)"
+                    class="dropdown-content"
+                  >
                     <v-img style="margin:50px">
                       <img :src="item.volumeInfo.imageLinks.thumbnail" />
                     </v-img>
@@ -97,18 +97,25 @@
                       <v-card color="#F8485E">
                         <div class="d-flex flex-no-wrap justify-space-between">
                           <div>
-                            <v-card-title class="text-h5 whiteText">{{
+                            <v-card-title class="text-h5 whiteText margLeft">{{
                               item.volumeInfo.title
                             }}</v-card-title>
-
-                            <div style="margin-left:45px" class="whiteText">
-                              Author:{{ item.volumeInfo.authors }}
+                            <div class="combineAuthors">
+                              <div class="whiteText">
+                                {{ item.volumeInfo.authors.join(", ") }}
+                              </div>
+                              <!-- <div
+                                v-for="author in item.volumeInfo.authors"
+                                :key="author"
+                                id="titleName"
+                                class="whiteText "
+                              >
+                                <span> {{ author | Author }}</span>
+                              </div> -->
                             </div>
-                            <v-card-subtitle
-                              class="whiteText"
-                              style="border-radius:30px"
-                              v-text="item.volumeInfo.description"
-                            ></v-card-subtitle>
+                            <v-card-subtitle class="whiteText desc">{{
+                              item.volumeInfo.description
+                            }}</v-card-subtitle>
                           </div>
 
                           <v-avatar class="ma-3" size="200" tile>
@@ -124,15 +131,6 @@
               </template>
             </Content>
           </div>
-          <!-- <img :src="item.volumeInfo.imageLinks.thumbnail" /> -->
-          <!-- <a
-              @click="clickCard"
-              :title="item.volumeInfo.title"
-              class="anchorTag"
-              href="#"
-              v-show="show"
-              >{{ item.volumeInfo.title }}</a
-            > -->
         </div>
       </v-col>
     </v-row>
@@ -145,14 +143,12 @@
 //If Person wants another Search fix that issue
 //Click Anywhere else in the window it will stop the searching Process - Done
 import axios from "axios";
-import { directive as onClickaway } from "vue-clickaway";
+// import { directive as onClickaway } from "vue-clickaway";
 import HelloWorld from "../components/HelloWorld";
 import Content from "../components/Content";
 export default {
   name: "Home",
-  directives: {
-    onClickaway: onClickaway,
-  },
+
   data() {
     return {
       BASE_URL: "https://www.googleapis.com/books/v1/volumes",
@@ -162,11 +158,6 @@ export default {
       labeling: "Search For Book",
       show: false,
       indexToShow: null,
-      // intitle: "",
-      // inauthor: "",
-      // inpublisher: "",
-      // subject: "",
-      // isbn: "",
       radioValue: "",
       extraTextField: false,
       extraInput: "",
@@ -178,6 +169,15 @@ export default {
   },
   created() {},
   computed: {},
+  filters: {
+    Author(value) {
+      if (value.length == 1) {
+        return value;
+      } else {
+        return value + ",";
+      }
+    },
+  },
   //Fetch the required Information from Google Book Api
 
   watch: {},
@@ -190,7 +190,7 @@ export default {
         let response = await axios.get(`${this.BASE_URL}`, {
           params: {
             q: `${this.search} ${this.radioValue}:${this.extraInput}`,
-            apikey: "",
+            apikey: "AIzaSyAPAU-uUc7h9mMCAwL2O_8wEoAXKV7CY2w",
           },
         });
         // console.log(response.data.items);
@@ -200,10 +200,10 @@ export default {
         // fetchAPI();
       }
     },
-    away() {
-      console.log("clicked away");
-      this.show = false;
-    },
+    // away() {
+    //   console.log("clicked away");
+    //   this.show = false;
+    // },
     clickCard(item, index) {
       console.log(item);
       this.indexToShow = index;
@@ -220,18 +220,25 @@ export default {
       }, 1000);
     },
     selectCheckbox() {
-      if (this.radioValue === "intitle") {
+      if (this.radioValue === "") {
         this.extraTextField = false;
       } else {
         this.extraTextField = true;
       }
     },
+    hideBar() {
+      this.show = false;
+    },
   },
 };
 </script>
 <style scoped>
-.c {
-  display: inline-block;
+.desc {
+  font-family: "IBM Plex Mono", monospace;
+}
+#titleName {
+  color: yellow;
+  font-family: "Gowun Batang", serif;
 }
 .anchorTag {
   /* position: absolute; */
@@ -244,10 +251,13 @@ export default {
   color: darkmagenta;
   margin-top: 50px;
 }
-
+.margLeft {
+  margin-left: 50px;
+}
 .whiteText {
   color: #eeeeee;
 }
+
 .dropdown-content {
   display: -webkit-box;
   /* position: absolute; */
@@ -267,6 +277,11 @@ export default {
 
 .dropdown-content:hover {
   background-color: #f1f1f1;
+}
+.combineAuthors {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 50px;
 }
 </style>
 <style>
